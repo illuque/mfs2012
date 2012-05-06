@@ -4,6 +4,7 @@
 
 static char *apikey;
 static char *query = "batman";
+static char *type= "movies";
 static GMainLoop *loop;
 
 static GOptionEntry entries[] = {
@@ -20,6 +21,13 @@ static GOptionEntry entries[] = {
 		.arg = G_OPTION_ARG_STRING,
 		.arg_data = &query,
 		.description = "term to search",
+	},
+        {
+		.long_name = "type",
+		.short_name = 't',
+		.arg = G_OPTION_ARG_STRING,
+		.arg_data = &type,
+		.description = "type to search",
 	},
         {
 		.long_name = NULL,
@@ -55,10 +63,31 @@ gboolean
 test1(void *data)
 {
 	GtFeed *feed = g_object_new(GT_TYPE_FEED, "api-key", apikey, NULL);
-	if (!gt_feed_search(feed, GT_FEED_SEARCH_MOVIES, query, cb, NULL)) {
+	
+	if (0 == g_strcmp0(type, "movies"))
+	{
+		g_print("Searching movies\n");
+		if (!gt_feed_search(feed, GT_FEED_SEARCH_MOVIES, query, cb, NULL))
+			g_main_loop_quit(loop);
+	}
+	else if (0 == g_strcmp0(type, "episodes"))
+	{
+		g_print("Searching episodes\n");                
+		if (!gt_feed_search(feed, GT_FEED_SEARCH_EPISODES, query, cb, NULL))
+			g_main_loop_quit(loop);
+	}
+	else if (0 == g_strcmp0(type, "shows"))
+	{
+		g_print("Searching shows\n");
+		if (!gt_feed_search(feed, GT_FEED_SEARCH_SHOWS, query, cb, NULL))
+			g_main_loop_quit(loop);
+	}
+	else
+	{
+		g_print("Wrong type parameter, searching default (movies)\n");
 		g_main_loop_quit(loop);
 	}
-        g_object_unref(feed);
+	g_object_unref(feed);
 
 	return FALSE;
 }
