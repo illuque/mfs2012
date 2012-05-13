@@ -21,9 +21,27 @@ class TraktorWindow(Gtk.Window):
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(box)
 
+        self.store = Gtk.ListStore(int, str, str)
+
+        view = Gtk.TreeView(self.store)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn('Title', renderer, text=1)
+        view.append_column(column)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn('Description', renderer, text=2)
+        view.append_column(column)
+
+        view.connect('row-activated', self._on_row_activated)
+
+
         self.ui_manager = self._setup_ui_manager()
         menu_bar = self.ui_manager.get_widget('/MenuBar')
         box.pack_start(menu_bar, False, False, 0)
+        box.add(view)
+
+        self._update_list()
 
         search_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         box.pack_start(search_box, False, False, 0)
@@ -34,6 +52,12 @@ class TraktorWindow(Gtk.Window):
         search_box.pack_start(program_entry, False, False, 0)
 
         self.connect('delete-event', self._quit)
+
+    def _update_list(self):
+        self.store.append([0, 'Cars', 'A red car...'])
+        self.store.append([1, 'Toy Story', 'Buzz and Buddy...'])
+        self.store.append([2, 'Up', 'A house with baloons...'])
+
 
     def _setup_ui_manager(self):
         ui_manager = Gtk.UIManager()
@@ -55,6 +79,10 @@ class TraktorWindow(Gtk.Window):
         about.set_program_name("Traktor")
         about.run()
         about.destroy()
+
+    def _on_row_activated(self, tree_view, path, column):
+        item = tree_view.get_model().get_iter(path)
+        print 'Title:', tree_view.get_model().get_value(item, 1)
 
     def _quit(self, window, event):
         Gtk.main_quit()

@@ -1,3 +1,3 @@
-SUBDIRS = src
+SUBDIRS = backend
 
 ACLOCAL_AMFLAGS = -I m4
